@@ -1,6 +1,57 @@
 import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
+import { staticPlugin } from "@elysiajs/static";
+import {swagger} from "@elysiajs/swagger";
+import {jwt} from "@elysiajs/jwt";
+
+import {CustomerController} from "./controllers/CustomerController";
 
 const app = new Elysia()
+
+.use(cors())
+.use(staticPlugin())
+.use(swagger())
+.use(jwt({
+  name: "jwt",
+  secret: "secret",
+}))
+
+.get("/customer", CustomerController.list)
+.post("/customer", CustomerController.create)
+.put("/customer/:id", CustomerController.update)
+.delete("/customer/:id", CustomerController.delete)
+
+
+//login jwt token
+.post("/login", async ({jwt,cookie:{auth}})=>{
+  const user = {
+    id: 1,
+    name: "admin",
+    username: "admin",
+    level: "admin"
+  }
+  const token = await jwt.sign(user);
+  auth.set({
+    value: token,
+    maxAge: 60 * 60 * 24 * 30,
+    httpOnly: true,
+    secure: true,
+  })
+  return {token: token};
+})
+
+.get("/profile", async ({cookie: {auth}, jwt})=> {
+  const token = auth.value;
+  const user = await jwt.verify(token);
+  return user;
+})
+.get("/logout", ({cookie: {auth}})=> {
+  auth.remove();
+  return {message: "logout success"};
+})
+
+
+
 .get("/", () => "Hello Elysia")
 .get("/hello", ()=> "hello world")
 .get("/hello/:name/:age", ({params})=> {
@@ -28,9 +79,55 @@ const app = new Elysia()
   return customer;
 })
 
+.get("/customer/query", ({query})=> {
+  const name = query.name;
+  const age = query.age;
+  return {name, age};
+})  
+
+.get("/customer/status", ()=> {
+  return new Response("ok", {status: 500});
+})
+
+.post("/customer/create", ({body})=> {
+  const {name, age} = body as {name: string, age: number}; 
+  return `create customer ${name} ${age}`;
+})
+
+.put("/customer/update/:id", ({params, body})=> {
+  const {id} = params as {id: string}; 
+  const {name, age} = body as {name: string, age: number};
+  return `update customer ${id} ${name} ${age}`;
+})
+
+.delete("/customer/delete/:id", ({params})=> {
+  const {id} = params as {id: string}; 
+  return `delete customer ${id}`;
+})
+
+//upload file
+.post("/upload-file", ({body})=> {
+  const {file} = body as {file: File};
+
+  Bun.write(`./uploads/${file.name}`, file);
+  return `upload file ${file}`;
+})  
+
+.get("/write-file", ()=> {
+ Bun.write(`./uploads/text.txt`, "hello world");
+  return `write file`;
+})
+
+//read file
+.get("/read-file", ()=> {
+  const file = Bun.file(`./uploads/text.txt`);
+  return file.text();
+})
+
+
 .listen(3000);
 
-//get params
+
 
 
 console.log(
