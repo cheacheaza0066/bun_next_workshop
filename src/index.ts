@@ -5,6 +5,7 @@ import {swagger} from "@elysiajs/swagger";
 import {jwt} from "@elysiajs/jwt";
 
 import {CustomerController} from "./controllers/CustomerController";
+import {UserController} from "./controllers/UserController";
 
 const app = new Elysia()
 
@@ -16,11 +17,19 @@ const app = new Elysia()
   secret: "secret",
 }))
 
-.get("/customer", CustomerController.list)
+.group("/users",(app) => app
+  .get("/", UserController.list)
+  .post("/", UserController.create)
+  .put("/:id", UserController.update)
+  .delete("/:id", UserController.delete)
+)
+
+.group("/customers",(app) => app
+  .get("/", CustomerController.list)
 .post("/customer", CustomerController.create)
 .put("/customer/:id", CustomerController.update)
-.delete("/customer/:id", CustomerController.delete)
-
+  .delete("/:id", CustomerController.delete)
+)
 
 //login jwt token
 .post("/login", async ({jwt,cookie:{auth}})=>{
@@ -50,6 +59,17 @@ const app = new Elysia()
   return {message: "logout success"};
 })
 
+.get("/info", async ({ request, jwt }) => {
+  if(request.headers.get("Authorization") === null) return {error: "No Authorization header"};
+  const token = request.headers.get("Authorization")?? '';
+  if(token === '') return {error: "No token"};
+
+  const payload = await jwt.verify(token);
+  return {
+    message: "Success",
+    payload: payload
+  };
+})
 
 
 .get("/", () => "Hello Elysia")

@@ -10,7 +10,9 @@
     "@elysiajs/jwt": "^1.1.1",
     "@elysiajs/static": "^1.1.1",
     "@elysiajs/swagger": "^1.1.6",
-    "elysia": "latest"
+    "@prisma/client": "^6.0.0",
+    "elysia": "latest",
+    "prisma": "^6.0.0"
   },
   "devDependencies": {
     "bun-types": "latest"
