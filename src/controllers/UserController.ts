@@ -63,7 +63,9 @@ export const UserController = {
     sort : async () =>{
         return await prisma.user.findMany({orderBy: {id: "desc"}});
     },
-    
+    between : async () =>{
+        return await prisma.user.findMany({where: {credit: {gte: 0, lte: 200}}});
+    }
     
     
         

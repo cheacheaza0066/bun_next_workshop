@@ -38,6 +38,7 @@ const app = new Elysia()
   .delete("/:id", UserController.delete ,{tags: ["User"]})
   .get("/findsomefield", UserController.findsomeField ,{tags: ["User"]})
   .get("/sort", UserController.sort ,{tags: ["User"]})
+  .get("/between", UserController.between ,{tags: ["User"]})
 )
 .group("/customers",(app) => app
   .get("/", CustomerController.list ,{tags: ["Customer"]})
