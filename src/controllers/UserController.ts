@@ -24,21 +24,49 @@ export const UserController = {
 
         
     },
-    update : async ({body, params}:{body: {email: string, password: string}, params: {id: number}})=>{
+    update : async ({body, params}:{body: {email: string, password: string}, params: {id: string}})=>{
         try{
-            const user = await prisma.user.update({data: body, where: {id: params.id}});
+            const user = await prisma.user.update({data: body, where: {id: parseInt(params.id)}});
+            return {
+                message: "User updated successfully",
+                user:user};
+        }catch(error){
+            return error;
+        }
+    },
+    delete : async ({params}:{params: {id: string}})=>{
+        try{
+            const user = await prisma.user.delete({where: {id: parseInt(params.id)}});
+            return {
+                message: "User deleted successfully",
+                user:user};
+        }catch(error){
+            return error;
+        }
+    },
+
+    findsomeField : async () =>{
+        try{
+            const user = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    email: true,
+                    password: true
+                }
+            });
             return user;
         }catch(error){
             return error;
         }
     },
-    delete : async ({params}:{params: {id: number}})=>{
-        try{
-            const user = await prisma.user.delete({where: {id: params.id}});
-            return user;
-        }catch(error){
-            return error;
-        }
-    }
+
+    sort : async () =>{
+        return await prisma.user.findMany({orderBy: {id: "desc"}});
+    },
     
+    
+    
+        
+
+
 }

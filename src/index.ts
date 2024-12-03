@@ -11,24 +11,39 @@ const app = new Elysia()
 
 .use(cors())
 .use(staticPlugin())
-.use(swagger())
+.use(swagger(
+  {
+    documentation: {
+      tags: [{
+        name: "User",
+        description: "User API"
+      },
+    {
+      name: "Customer",
+      description: "Customer API"
+    }
+    ]
+    }
+  }
+))
 .use(jwt({
   name: "jwt",
   secret: "secret",
 }))
 
 .group("/users",(app) => app
-  .get("/", UserController.list)
-  .post("/", UserController.create)
-  .put("/:id", UserController.update)
-  .delete("/:id", UserController.delete)
+  .get("/", UserController.list ,{tags: ["User"]})
+  .post("/", UserController.create ,{tags: ["User"]})
+  .put("/:id", UserController.update ,{tags: ["User"]})
+  .delete("/:id", UserController.delete ,{tags: ["User"]})
+  .get("/findsomefield", UserController.findsomeField ,{tags: ["User"]})
+  .get("/sort", UserController.sort ,{tags: ["User"]})
 )
-
 .group("/customers",(app) => app
-  .get("/", CustomerController.list)
-.post("/customer", CustomerController.create)
-.put("/customer/:id", CustomerController.update)
-  .delete("/:id", CustomerController.delete)
+  .get("/", CustomerController.list ,{tags: ["Customer"]})
+.post("/customer", CustomerController.create ,{tags: ["Customer"]})
+.put("/customer/:id", CustomerController.update ,{tags: ["Customer"]})
+  .delete("/:id", CustomerController.delete ,{tags: ["Customer"]})
 )
 
 //login jwt token
