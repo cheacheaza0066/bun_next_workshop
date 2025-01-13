@@ -6,6 +6,7 @@ import {jwt} from "@elysiajs/jwt";
 
 import {CustomerController} from "./controllers/CustomerController";
 import {UserController} from "./controllers/UserController";
+import { DeportmentController } from "./controllers/DeportmentController";
 
 const app = new Elysia()
 
@@ -21,6 +22,10 @@ const app = new Elysia()
     {
       name: "Customer",
       description: "Customer API"
+    },
+    {
+      name: "Deportment",
+      description: "Deportment API"
     }
     ]
     }
@@ -30,6 +35,12 @@ const app = new Elysia()
   name: "jwt",
   secret: "secret",
 }))
+.group("/deportment",{tags:["Deportment"]},(app) => app
+  .get("/", DeportmentController.list ,)
+  .get("/user-in-department/:id", DeportmentController.userInDepartment ,)
+  .post("/create-department-and-users", DeportmentController.createDepartmentAndUsers ,)
+
+)
 
 .group("/users",(app) => app
   .get("/", UserController.list ,{tags: ["User"]})
@@ -39,6 +50,13 @@ const app = new Elysia()
   .get("/findsomefield", UserController.findsomeField ,{tags: ["User"]})
   .get("/sort", UserController.sort ,{tags: ["User"]})
   .get("/between", UserController.between ,{tags: ["User"]})
+  .get("/count", UserController.count ,{tags: ["User"]})
+  .get("/sum", UserController.sum ,{tags: ["User"]})
+  .get("/min", UserController.min ,{tags: ["User"]})  
+  .get("/max", UserController.max ,{tags: ["User"]})
+  .get("/user-and-department", UserController.userAndDepartment ,{tags: ["User"]})
+   .post("/sigin", UserController.signIn ,{tags: ["User"]})
+   
 )
 .group("/customers",(app) => app
   .get("/", CustomerController.list ,{tags: ["Customer"]})
